@@ -1,8 +1,15 @@
 import AsynchronousAutocompleteCreatable from "@/components/AsynchronousAutocompleteCreatable";
 import ProductCreatorDialog from "@/features/products/components/ProductCreatorDialog";
-import ProductDTO from "@/features/products/productDTO";
-import useFetchApi from "@/features/utils/useFetchApi";
-import { Autocomplete, Button, Paper, Select, TextField } from "@mui/material";
+import ProductDTO, { MesureUnit } from "@/features/products/productDTO";
+import {
+  Button,
+  FormControl,
+  Grid2,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
 import { useState } from "react";
 
 interface OrderCreatorProps {
@@ -25,33 +32,60 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ dispatch }) => {
   };
 
   return (
-    <Paper>
-      <AsynchronousAutocompleteCreatable
-        label="Product"
-        requestUrl="api/products"
-        mapper={(data: ProductDTO) => ({ label: data.name })}
-        createrDialog={(props) => <ProductCreatorDialog {...props} />}
-      />
-      <TextField
-        label="Value"
-        type="number"
-        value={value}
-        onChange={(e) => setValue(parseFloat(e.target.value))}
-      />
-      <TextField
-        label="Amount"
-        type="number"
-        value={product}
-        onChange={(e) => setAmount(parseFloat(e.target.value))}
-      />
-      <Select
-        label="Measure Unit"
-        value={measureUnit}
-        onChange={(e) => setMeasureUnit(e.target.value)}
-      ></Select>
-      <TextField label="Total" type="number" value={value * amount} />
+    <Grid2 container spacing={2}>
+      <Grid2 size={4}>
+        <AsynchronousAutocompleteCreatable
+          label="Product"
+          requestUrl="api/products"
+          mapper={(data: ProductDTO) => ({ label: data.name })}
+          createrDialog={(props) => <ProductCreatorDialog {...props} />}
+        />
+      </Grid2>
+      <Grid2 size={4}>
+        <FormControl fullWidth>
+          <TextField
+            label="Value"
+            type="number"
+            value={value}
+            onChange={(e) => setValue(parseFloat(e.target.value))}
+          />
+        </FormControl>
+      </Grid2>
+      <Grid2 size={4}>
+        <FormControl fullWidth>
+          <TextField
+            label="Amount"
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(parseFloat(e.target.value))}
+          />
+        </FormControl>
+      </Grid2>
+      <Grid2 size={4}>
+        <FormControl fullWidth>
+          <InputLabel>Measure Unit</InputLabel>
+          <Select
+            label="Measure Unit"
+            value={measureUnit}
+            onChange={(e) => setMeasureUnit(e.target.value)}
+          >
+            {Object.entries(MesureUnit).map(([key, value]) => {
+              return (
+                <MenuItem key={key} value={value}>
+                  {value}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
+      </Grid2>
+      <Grid2 size={4}>
+        <FormControl fullWidth>
+          <TextField disabled label="Total" type="number" value={value * amount} />
+        </FormControl>
+      </Grid2>
       <Button type="submit">Add</Button>
-    </Paper>
+    </Grid2>
   );
 };
 

@@ -19,10 +19,11 @@ export interface AsynchronousAutocompleteCreatableDialogProps {
 }
 
 export interface AsynchronousAutocompleteCreatableProps {
-  label: string;
+  label?: string;
   requestUrl: string;
   mapper: (data: any) => SearchableOption;
   createrDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps>;
+  onChange?: (value: any) => void;
 }
 
 const AsynchronousAutocompleteCreatable: React.FC<
