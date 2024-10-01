@@ -1,48 +1,42 @@
 import useFetchApi from "@/features/utils/useFetchApi";
-import {
-  Autocomplete,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
-import React, { Fragment, useState } from "react";
+import { Autocomplete, TextField } from "@mui/material";
+import React, { Fragment, SetStateAction, useCallback, useState } from "react";
 
 interface SearchableOption {
   inputValue?: string;
   label: string;
 }
 
-interface AsynchronousAutocompleteCreatableProps<
-  TIn,
-  TOpt extends SearchableOption
-> {
-  label: string;
-  requestUrl: string;
-  mapToOption: (data: TIn) => TOpt;
+interface DialogParentProps {
+  typed: string;
+  open: boolean;
 }
 
-const AsynchronousAutocompleteCreatable = <TIn, TOpt extends SearchableOption>({
-  requestUrl,
-  label,
-  mapToOption: optionMap,
-}: AsynchronousAutocompleteCreatableProps<TIn, TOpt>) => {
-  const [options, loading, error] = useFetchApi<Array<TIn>>(requestUrl, []);
-  const [value, setValue] = useState<TOpt | null>(null);
-  const [open, toggleOpen] = useState<boolean>(false);
-  const [dialogValue, setDialogValue] = useState({ name: "" });
+export interface AsynchronousAutocompleteCreatableDialogProps {
+  parentState: DialogParentProps;
+  setParentState: React.Dispatch<SetStateAction<DialogParentProps>>;
+  dispatchDialogValue: (value: any) => void;
+}
 
-  const handleClose = () => {
-    toggleOpen(false);
-  };
+export interface AsynchronousAutocompleteCreatableProps {
+  label: string;
+  requestUrl: string;
+  mapper: (data: any) => SearchableOption;
+  createrDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps>;
+}
 
-  const handleSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
-    ev.preventDefault();
+const AsynchronousAutocompleteCreatable: React.FC<
+  AsynchronousAutocompleteCreatableProps
+> = ({ label, requestUrl, mapper, createrDialog }) => {
+  const [options, loading, error] = useFetchApi<Array<object>>(requestUrl, []);
+  const [value, setValue] = useState<SearchableOption | null>(null);
+  const [dialogProps, setDialogProps] = useState<DialogParentProps>({
+    typed: "",
+    open: false,
+  });
 
-    handleClose();
+  const dispatchDialogValue = (value: any) => {
+    setValue(value);
   };
 
   return (
@@ -50,22 +44,30 @@ const AsynchronousAutocompleteCreatable = <TIn, TOpt extends SearchableOption>({
       <Autocomplete
         loading={loading}
         value={value}
-        onChange={(ev, newValue) => {}}
+        onChange={(_, typed) => {
+          if (typeof typed === "string") {
+            setDialogProps({ typed, open: true });
+          } else if (typed && typed.inputValue) {
+            setDialogProps({ typed: typed.inputValue, open: true });
+          } else {
+            setValue(typed);
+          }
+        }}
         filterOptions={(options, state) => {
-          const filtered = options.filter((opt) =>
-            opt.label.includes(state.inputValue)
+          const filtered = options.filter((option) =>
+            option.label.includes(state.inputValue)
           );
 
           if (state.inputValue !== "") {
             filtered.push({
               inputValue: state.inputValue,
               label: `Add "${state.inputValue}"`,
-            } as TOpt);
+            });
           }
 
           return filtered;
         }}
-        options={options.map(optionMap)}
+        options={options.map(mapper)}
         getOptionLabel={(option) => {
           if (typeof option === "string") {
             return option;
@@ -89,27 +91,11 @@ const AsynchronousAutocompleteCreatable = <TIn, TOpt extends SearchableOption>({
         freeSolo
         renderInput={(params) => <TextField {...params} label={label} />}
       />
-      <Dialog open={open} onClose={handleClose}>
-        <form onSubmit={handleSubmit}>
-          <DialogTitle>Add a new {label}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Define details of the new {label}
-            </DialogContentText>
-            <TextField
-              value={dialogValue.name}
-              onChange={(ev) => {
-                setDialogValue({ ...dialogValue, name: ev.target.value });
-              }}
-              variant="standard"
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button type="submit">Add</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      {createrDialog({
+        parentState: dialogProps,
+        setParentState: setDialogProps,
+        dispatchDialogValue,
+      })}
     </Fragment>
   );
 };
