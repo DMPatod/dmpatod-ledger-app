@@ -13,25 +13,25 @@ import {
   TextField,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { Moment } from "moment";
 import { useState } from "react";
-import { Currency, Direction } from "../ticketDTO";
-import styles from "./TicketCreator.module.scss";
+import TicketDTO, { Currency, Direction } from "../ticketDTO";
+import OrderDTO from "@/features/orders/orderDTO";
 
 const TicketCreator = () => {
-  const [date, setDate] = useState<Moment | null>(null);
-  const [orders, setOrders] = useState<Array<OrderDTO>>([]);
-  const [installments, setInstallments] = useState<number>(1);
-  const [currency, setCurrency] = useState<string>("");
-  const [direction, setDirection] = useState<string>("");
+  const [value, setValue] = useState<TicketDTO>({
+    provider: { name: "" },
+    date: null,
+    orders: [],
+    installments: 1,
+    currency: Currency.BRL,
+    direction: Direction.Income,
+  });
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
-  const pushOrder = (order: OrderDTO) => {
-    setOrders([...orders, order]);
-  };
+  const pushOrder = (order: OrderDTO) => {};
 
   return (
     <Grid2 container spacing={2}>
@@ -41,21 +41,22 @@ const TicketCreator = () => {
           requestUrl="api/providers"
           mapper={(data: ProviderDTO) => ({ label: data.name })}
           createrDialog={(props) => <ProviderCreatorDialog {...props} />}
+          onChange={(_, provider) => setValue({ ...value, provider: provider })}
         />
       </Grid2>
       <Grid2 size={2}>
         <FormControl fullWidth>
           <DatePicker
             label="Date"
-            value={date}
-            onChange={(val) => setDate(val)}
+            value={value.date}
+            onChange={(val) => setValue({ ...value, date: val })}
           />
         </FormControl>
       </Grid2>
       <Grid2 size={6}>
-        <Paper className={styles.orderPaper}>
+        <Paper className="formPadding">
           <Grid2 container spacing={2}>
-            <OrderDisplay orders={orders} />
+            {/* <OrderDisplay orders={value.orders} /> */}
             <OrderCreator dispatch={pushOrder} />
           </Grid2>
         </Paper>
@@ -64,10 +65,10 @@ const TicketCreator = () => {
         <TextField
           type="number"
           label="installments"
-          value={installments}
-          onChange={(ev) => {
-            setInstallments(parseInt(ev.target.value));
-          }}
+          value={value.installments}
+          onChange={(ev) =>
+            setValue({ ...value, installments: parseInt(ev.target.value) })
+          }
         />
       </Grid2>
       <Grid2 size={2}>
@@ -75,14 +76,17 @@ const TicketCreator = () => {
           <InputLabel>Currency</InputLabel>
           <Select
             label="Currency"
-            value={currency}
-            onChange={(ev) => {
-              setCurrency(ev.target.value);
-            }}
+            value={value.currency}
+            onChange={(ev) =>
+              setValue({
+                ...value,
+                currency: Currency[ev.target.value as keyof typeof Currency],
+              })
+            }
           >
-            {Object.entries(Currency).map(([key, value]) => {
+            {Object.keys(Currency).map((value, index) => {
               return (
-                <MenuItem key={key} value={value}>
+                <MenuItem key={index} value={value}>
                   {value}
                 </MenuItem>
               );
@@ -95,14 +99,17 @@ const TicketCreator = () => {
           <InputLabel>Direction</InputLabel>
           <Select
             label="Direction"
-            value={direction}
-            onChange={(ev) => {
-              setDirection(ev.target.value);
-            }}
+            value={value.direction}
+            onChange={(ev) =>
+              setValue({
+                ...value,
+                direction: Direction[ev.target.value as keyof typeof Direction],
+              })
+            }
           >
-            {Object.entries(Direction).map(([key, value]) => {
+            {Object.keys(Direction).map((value, index) => {
               return (
-                <MenuItem key={key} value={value}>
+                <MenuItem key={index} value={value}>
                   {value}
                 </MenuItem>
               );
@@ -113,9 +120,10 @@ const TicketCreator = () => {
       <Grid2 size={4}>
         <Button
           type="submit"
+          variant="contained"
           onClick={() => {
             console.log("Post");
-            console.log({ date, orders, installments, currency, direction });
+            console.log(value);
           }}
         >
           Post

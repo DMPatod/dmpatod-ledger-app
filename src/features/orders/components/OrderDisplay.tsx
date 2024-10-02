@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import React from "react";
+import OrderDTO from "../orderDTO";
 
 interface OrderDisplayProps {
   orders: Array<OrderDTO>;

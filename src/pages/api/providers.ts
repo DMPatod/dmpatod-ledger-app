@@ -6,6 +6,8 @@ const serverUrl = process.env.SERVER_URL;
 //   ca: readFileSync("./certificates/localhost.pem"),
 // });
 
+const providers: Array<ProviderDTO> = [];
+
 async function retrieveProviders(req: NextApiRequest, res: NextApiResponse) {
   // const url = `${serverUrl}/providers`;
   // const request = await fetch(url);
@@ -18,12 +20,14 @@ async function retrieveProviders(req: NextApiRequest, res: NextApiResponse) {
   // var providers: Array<ProviderDTO> = response.map((item: any) => ({
   //   name: item.name,
   // }));
-  const providers: Array<ProviderDTO> = [
-    { name: "Provider 1" },
-    { name: "Provider 2" },
-  ];
   res.status(200).json(providers);
   return providers;
+}
+
+async function createProvider(req: NextApiRequest, res: NextApiResponse) {
+  providers.push({ name: req.body.name });
+
+  res.status(201).json({ id: "justCreated", ...req.body } as ProviderDTO);
 }
 
 export default async function handler(
@@ -32,14 +36,10 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      var providers: Array<ProviderDTO> = await retrieveProviders(req, res);
+      await retrieveProviders(req, res);
       return;
     case "POST":
-      var providers: Array<ProviderDTO> = [
-        { name: "dakwopd" },
-        { name: "dwa" },
-      ];
-      res.status(201).json(providers);
+      await createProvider(req, res);
       return;
     default:
       res.status(405).end();

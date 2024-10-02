@@ -1,6 +1,5 @@
-import useFetchApi from "@/features/utils/useFetchApi";
 import { Autocomplete, TextField } from "@mui/material";
-import React, { Fragment, SetStateAction, useCallback, useState } from "react";
+import React, { Fragment, SetStateAction, useEffect, useState } from "react";
 
 interface SearchableOption {
   inputValue?: string;
@@ -23,49 +22,82 @@ export interface AsynchronousAutocompleteCreatableProps {
   requestUrl: string;
   mapper: (data: any) => SearchableOption;
   createrDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps>;
-  onChange?: (value: any) => void;
+  onChange?: (ev: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
 const AsynchronousAutocompleteCreatable: React.FC<
   AsynchronousAutocompleteCreatableProps
-> = ({ label, requestUrl, mapper, createrDialog }) => {
-  const [options, loading, error] = useFetchApi<Array<object>>(requestUrl, []);
-  const [value, setValue] = useState<SearchableOption | null>(null);
+> = ({ label, requestUrl, mapper, createrDialog, onChange }) => {
+  const [options, setOptions] = useState<Array<SearchableOption>>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [innerValue, setInnerValue] = useState<SearchableOption | null>(null);
   const [dialogProps, setDialogProps] = useState<DialogParentProps>({
     typed: "",
     open: false,
   });
 
+  useEffect(() => {
+    const fetchOptions = async () => {
+      setLoading(true);
+      const request = await fetch(requestUrl);
+      if (request.status < 200 || request.status >= 400) {
+        setError("Failed to fetch data.");
+        return;
+      }
+      const response = await request.json();
+      setLoading(false);
+      setOptions(response.map(mapper));
+    };
+
+    fetchOptions();
+  }, [innerValue]);
+
   const dispatchDialogValue = (value: any) => {
-    setValue(value);
+    setInnerValue(mapper(value));
+    onChange && onChange(null!, value);
+  };
+
+  const onChangeHandler = (
+    ev: React.SyntheticEvent<Element, Event>,
+    value: any
+  ) => {
+    if (typeof value === "string") {
+      setDialogProps({ typed: value, open: true });
+    } else if (value && value.inputValue) {
+      setDialogProps({ typed: value.inputValue, open: true });
+    } else if (value && value.label) {
+      setInnerValue(value);
+      onChange &&
+        onChange(
+          ev,
+          options.find((item) => mapper(item).label === value.label)
+        );
+    } else {
+      setInnerValue(null);
+      onChange && onChange(ev, null);
+    }
   };
 
   return (
     <Fragment>
       <Autocomplete
         loading={loading}
-        value={value}
-        onChange={(_, typed) => {
-          if (typeof typed === "string") {
-            setDialogProps({ typed, open: true });
-          } else if (typed && typed.inputValue) {
-            setDialogProps({ typed: typed.inputValue, open: true });
-          } else {
-            setValue(typed);
-          }
-        }}
+        value={innerValue}
+        onChange={onChangeHandler}
         filterOptions={(options, state) => {
-          const filtered = options.filter((option) =>
-            option.label.includes(state.inputValue)
-          );
-
+          const filtered = options.filter((option) => {
+            if (option.label === undefined) {
+              return false;
+            }
+            return option.label.includes(state.inputValue);
+          });
           if (state.inputValue !== "") {
             filtered.push({
               inputValue: state.inputValue,
               label: `Add "${state.inputValue}"`,
             });
           }
-
           return filtered;
         }}
         options={options.map(mapper)}
@@ -90,7 +122,14 @@ const AsynchronousAutocompleteCreatable: React.FC<
           );
         }}
         freeSolo
-        renderInput={(params) => <TextField {...params} label={label} />}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            error={error !== null}
+            helperText={error}
+            label={label}
+          />
+        )}
       />
       {createrDialog({
         parentState: dialogProps,

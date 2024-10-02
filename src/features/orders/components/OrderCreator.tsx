@@ -1,34 +1,26 @@
 import AsynchronousAutocompleteCreatable from "@/components/AsynchronousAutocompleteCreatable";
 import ProductCreatorDialog from "@/features/products/components/ProductCreatorDialog";
 import ProductDTO, { MesureUnit } from "@/features/products/productDTO";
-import {
-  Button,
-  FormControl,
-  Grid2,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
+import { Button, FormControl, Grid2, TextField } from "@mui/material";
 import { useState } from "react";
+import OrderDTO from "../orderDTO";
+import styles from "@/pages/styles.scss";
 
 interface OrderCreatorProps {
   dispatch: (order: OrderDTO) => void;
 }
 
 const OrderCreator: React.FC<OrderCreatorProps> = ({ dispatch }) => {
-  const [product, setProduct] = useState<{ id: string; name: string }>({
+  const [product, setProduct] = useState<ProductDTO>({
     id: "",
     name: "",
+    mesureUnit: MesureUnit.Kilogram,
   });
   const [value, setValue] = useState<number>(0);
   const [amount, setAmount] = useState<number>(1);
-  const [measureUnit, setMeasureUnit] = useState<string>("");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    dispatch({ product, value, amount });
   };
 
   return (
@@ -63,28 +55,17 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ dispatch }) => {
       </Grid2>
       <Grid2 size={4}>
         <FormControl fullWidth>
-          <InputLabel>Measure Unit</InputLabel>
-          <Select
-            label="Measure Unit"
-            value={measureUnit}
-            onChange={(e) => setMeasureUnit(e.target.value)}
-          >
-            {Object.entries(MesureUnit).map(([key, value]) => {
-              return (
-                <MenuItem key={key} value={value}>
-                  {value}
-                </MenuItem>
-              );
-            })}
-          </Select>
+          <TextField
+            disabled
+            label="Total"
+            type="number"
+            value={value * amount}
+          />
         </FormControl>
       </Grid2>
-      <Grid2 size={4}>
-        <FormControl fullWidth>
-          <TextField disabled label="Total" type="number" value={value * amount} />
-        </FormControl>
-      </Grid2>
-      <Button type="submit">Add</Button>
+      <Button type="submit" variant="contained">
+        Add
+      </Button>
     </Grid2>
   );
 };

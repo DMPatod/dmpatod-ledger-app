@@ -1,6 +1,8 @@
 import { AsynchronousAutocompleteCreatableDialogProps } from "@/components/AsynchronousAutocompleteCreatable";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -8,6 +10,8 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import { green } from "@mui/material/colors";
+import axios from "axios";
 import React, { useState } from "react";
 
 interface ProviderCreatorDialogProps
@@ -20,7 +24,6 @@ const ProviderCreatorDialog: React.FC<ProviderCreatorDialogProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [dialogState, setDialogState] = useState({});
 
   const handleClose = () => {
     setParentState({ ...parentState, open: false });
@@ -30,17 +33,14 @@ const ProviderCreatorDialog: React.FC<ProviderCreatorDialogProps> = ({
     ev.preventDefault();
 
     setLoading(true);
-    const request = await fetch("/api/providers", {
-      method: "POST",
-      body: JSON.stringify({ name: parentState.typed }),
-    });
-    setLoading(false);
+    const request = await axios.post<ProviderDTO>("/api/providers", {
+      name: parentState.typed,
+    } as ProviderDTO);
     if (request.status < 200 || request.status >= 400) {
       setError("Failed to create a new provider.");
       return;
     }
-    const response = await request.json();
-    dispatchDialogValue(response);
+    dispatchDialogValue(request.data);
     handleClose();
   };
 
@@ -63,9 +63,24 @@ const ProviderCreatorDialog: React.FC<ProviderCreatorDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
-            Add
-          </Button>
+          <Box>
+            <Button type="submit" variant="contained" disabled={loading}>
+              Add
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: "absolute",
+                  color: green[500],
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
         </DialogActions>
       </form>
     </Dialog>
