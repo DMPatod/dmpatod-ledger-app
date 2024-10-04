@@ -1,33 +1,27 @@
+import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const serverUrl = process.env.SERVER_URL;
 
-// const agent = new Agent({
-//   ca: readFileSync("./certificates/localhost.pem"),
-// });
-
-const providers: Array<ProviderDTO> = [];
-
 async function retrieveProviders(req: NextApiRequest, res: NextApiResponse) {
-  // const url = `${serverUrl}/providers`;
-  // const request = await fetch(url);
-  // if (request.status < 200 && request.status >= 400) {
-  //   console.log("Request", request);
-  //   console.error("Request Error");
-  // }
-  // const response = await request.json();
-
-  // var providers: Array<ProviderDTO> = response.map((item: any) => ({
-  //   name: item.name,
-  // }));
-  res.status(200).json(providers);
-  return providers;
+  const request = await axios.get<Array<ProviderDTO>>(`${serverUrl}/providers`);
+  if (request.status < 200 && request.status >= 400) {
+    console.error("Request Error");
+    res.status(500).end();
+  }
+  res.status(200).json(request.data);
 }
 
 async function createProvider(req: NextApiRequest, res: NextApiResponse) {
-  providers.push({ name: req.body.name });
-
-  res.status(201).json({ id: "justCreated", ...req.body } as ProviderDTO);
+  const request = await axios.post<ProviderDTO>(
+    `${serverUrl}/providers`,
+    req.body
+  );
+  if (request.status < 200 && request.status >= 400) {
+    console.error("Request Error");
+    res.status(500).end();
+  }
+  res.status(201).json(request.data);
 }
 
 export default async function handler(
@@ -41,7 +35,7 @@ export default async function handler(
     case "POST":
       await createProvider(req, res);
       return;
-    default:
-      res.status(405).end();
   }
+
+  res.status(405).end();
 }

@@ -3,18 +3,18 @@ import OrderDTO from "../orders/orderDTO";
 
 export default interface TicketDTO {
   id?: string;
-  provider: ProviderDTO | null;
+  provider: ProviderDTO | string | null;
   date: Moment | null;
   orders: Array<OrderDTO>;
   installments: number;
-  currency: Currency;
-  direction: Direction;
+  currency: Currency | number;
+  direction: Direction | number;
 }
 
 export enum Currency {
   BRL,
   USD,
-  EUR,
+  NZD,
 }
 
 export enum Direction {

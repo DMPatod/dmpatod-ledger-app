@@ -1,6 +1,8 @@
 import { AsynchronousAutocompleteCreatableDialogProps } from "@/components/AsynchronousAutocompleteCreatable";
 import {
+  Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -17,6 +19,8 @@ import {
 import ProductDTO, { MesureUnit } from "../productDTO";
 import { useState } from "react";
 import styles from "@/pages/styles.module.scss";
+import axios from "axios";
+import { green } from "@mui/material/colors";
 
 interface ProductCreatorDialogProps
   extends AsynchronousAutocompleteCreatableDialogProps {}
@@ -24,11 +28,13 @@ interface ProductCreatorDialogProps
 const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
   parentState,
   setParentState,
+  dispatchDialogValue,
 }) => {
-  const [value, setValue] = useState<ProductDTO>({
-    name: parentState.typed,
+  const [value, setValue] = useState({
     mesureUnit: MesureUnit.Unit,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleClose = () => {
     setParentState({ ...parentState, open: false });
@@ -37,7 +43,17 @@ const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
   const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
-    console.log(value);
+    setLoading(true);
+    const request = await axios.post<ProductDTO>("/api/products", {
+      name: parentState.typed,
+      ...value,
+    } as ProductDTO);
+    if (request.status < 200 || request.status >= 400) {
+      setError("Failed to create a new product.");
+      return;
+    }
+    dispatchDialogValue(request.data);
+    handleClose();
   };
 
   return (
@@ -80,9 +96,9 @@ const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
                       }
                     }}
                   >
-                    {Object.entries(MesureUnit).map(([key, value]) => {
+                    {Object.values(MesureUnit).map((value, index) => {
                       return (
-                        <MenuItem key={key} value={value}>
+                        <MenuItem key={index} value={value}>
                           {value}
                         </MenuItem>
                       );
@@ -95,9 +111,24 @@ const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" variant="contained">
-            Add
-          </Button>
+          <Box>
+            <Button type="submit" variant="contained">
+              Add
+            </Button>
+            {loading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: "absolute",
+                  color: green[500],
+                  top: "50%",
+                  left: "50%",
+                  marginTop: "-12px",
+                  marginLeft: "-12px",
+                }}
+              />
+            )}
+          </Box>
         </DialogActions>
       </form>
     </Dialog>

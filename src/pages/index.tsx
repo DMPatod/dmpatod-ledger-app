@@ -1,10 +1,8 @@
-import TicketCreator from "@/features/tickets/components/TicketCreator";
-
 const Index = () => {
   return (
     <div>
       <main>
-        <TicketCreator />
+        <a href="/tickets/create">Create Ticket</a>
       </main>
     </div>
   );

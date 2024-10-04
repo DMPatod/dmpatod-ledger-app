@@ -1,22 +1,28 @@
 import ProductDTO from "@/features/products/productDTO";
+import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 
 const serverUrl = process.env.SERVER_URL;
 
-const products: Array<ProductDTO> = [];
-
 async function retrieveProducts(req: NextApiRequest, res: NextApiResponse) {
-  // const products: Array<ProductDTO> = [
-  //   { name: "Product 1" },
-  //   { name: "Product 2" },
-  // ];
-  res.status(200).json(products);
+  const request = await axios.get<Array<ProductDTO>>(`${serverUrl}/products`);
+  if (request.status < 200 && request.status >= 400) {
+    console.error("Request Error");
+    res.status(500).end();
+  }
+  res.status(200).json(request.data);
 }
 
 async function createProduct(req: NextApiRequest, res: NextApiResponse) {
-  const product: ProductDTO = req.body;
-  products.push(product);
-  res.status(201).json(product);
+  const request = await axios.post<ProductDTO>(
+    `${serverUrl}/products`,
+    req.body
+  );
+  if (request.status < 200 && request.status >= 400) {
+    console.error("Request Error");
+    res.status(500).end();
+  }
+  res.status(201).json(request.data);
 }
 
 export default async function handler(
@@ -25,9 +31,11 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      return await retrieveProducts(req, res);
+      await retrieveProducts(req, res);
+      return;
     case "POST":
-      return await createProduct(req, res);
+      await createProduct(req, res);
+      return;
     default:
       res.status(405).end();
   }

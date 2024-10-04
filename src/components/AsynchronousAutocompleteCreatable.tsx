@@ -1,4 +1,5 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, createFilterOptions, TextField } from "@mui/material";
+import axios from "axios";
 import React, { Fragment, SetStateAction, useEffect, useState } from "react";
 
 interface SearchableOption {
@@ -22,12 +23,15 @@ export interface AsynchronousAutocompleteCreatableProps {
   requestUrl: string;
   mapper: (data: any) => SearchableOption;
   createrDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps>;
-  onChange?: (ev: React.SyntheticEvent<Element, Event>, value: any) => void;
+  onChange?: (value: any) => void;
 }
+
+const filter = createFilterOptions<SearchableOption>({});
 
 const AsynchronousAutocompleteCreatable: React.FC<
   AsynchronousAutocompleteCreatableProps
 > = ({ label, requestUrl, mapper, createrDialog, onChange }) => {
+  const [memory, setMemory] = useState<Array<any>>([]);
   const [options, setOptions] = useState<Array<SearchableOption>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +44,14 @@ const AsynchronousAutocompleteCreatable: React.FC<
   useEffect(() => {
     const fetchOptions = async () => {
       setLoading(true);
-      const request = await fetch(requestUrl);
+      const request = await axios.get<Array<any>>(requestUrl);
       if (request.status < 200 || request.status >= 400) {
         setError("Failed to fetch data.");
         return;
       }
-      const response = await request.json();
       setLoading(false);
-      setOptions(response.map(mapper));
+      setMemory(request.data);
+      setOptions(request.data.map(mapper));
     };
 
     fetchOptions();
@@ -55,11 +59,11 @@ const AsynchronousAutocompleteCreatable: React.FC<
 
   const dispatchDialogValue = (value: any) => {
     setInnerValue(mapper(value));
-    onChange && onChange(null!, value);
+    onChange && onChange(value);
   };
 
   const onChangeHandler = (
-    ev: React.SyntheticEvent<Element, Event>,
+    _: React.SyntheticEvent<Element, Event>,
     value: any
   ) => {
     if (typeof value === "string") {
@@ -69,13 +73,10 @@ const AsynchronousAutocompleteCreatable: React.FC<
     } else if (value && value.label) {
       setInnerValue(value);
       onChange &&
-        onChange(
-          ev,
-          options.find((item) => mapper(item).label === value.label)
-        );
+        onChange(memory.find((item) => mapper(item).label === value.label));
     } else {
       setInnerValue(null);
-      onChange && onChange(ev, null);
+      onChange && onChange(null);
     }
   };
 
@@ -86,12 +87,7 @@ const AsynchronousAutocompleteCreatable: React.FC<
         value={innerValue}
         onChange={onChangeHandler}
         filterOptions={(options, state) => {
-          const filtered = options.filter((option) => {
-            if (option.label === undefined) {
-              return false;
-            }
-            return option.label.includes(state.inputValue);
-          });
+          const filtered = filter(options, state);
           if (state.inputValue !== "") {
             filtered.push({
               inputValue: state.inputValue,
@@ -100,7 +96,7 @@ const AsynchronousAutocompleteCreatable: React.FC<
           }
           return filtered;
         }}
-        options={options.map(mapper)}
+        options={options}
         getOptionLabel={(option) => {
           if (typeof option === "string") {
             return option;

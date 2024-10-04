@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 function useFetchApi<T>(
@@ -12,10 +13,12 @@ function useFetchApi<T>(
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const request = await fetch(url, fetchOptions);
-        const response = await request.json();
-
-        setData(response);
+        const request = await axios.get<T>(url);
+        if (request.status < 200 || request.status >= 400) {
+          setError("Error fetching data");
+          return;
+        }
+        setData(request.data);
       } catch (error) {
         setError("Error fetching data");
         console.log(error);

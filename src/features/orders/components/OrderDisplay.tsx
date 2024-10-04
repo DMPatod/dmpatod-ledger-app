@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import OrderDTO from "../orderDTO";
+import ProductDTO from "@/features/products/productDTO";
 
 interface OrderDisplayProps {
   orders: Array<OrderDTO>;
@@ -28,25 +29,24 @@ const OrderDisplay: React.FC<OrderDisplayProps> = ({ orders }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          <TableRow>
-            <TableCell>daw</TableCell>
-            <TableCell>casc</TableCell>
-            <TableCell>dawdsa</TableCell>
-            <TableCell>sad</TableCell>
-          </TableRow>
           {orders.map((order, index) => (
             <TableRow key={index}>
-              <TableCell>{order.product.name}</TableCell>
-              <TableCell>{order.product.name}</TableCell>
-              <TableCell>{order.product.name}</TableCell>
-              <TableCell>{order.product.name}</TableCell>
+              <TableCell>{(order.product as ProductDTO).name}</TableCell>
+              <TableCell>{order.value}</TableCell>
+              <TableCell>{order.amount}</TableCell>
+              <TableCell>{order.value * order.amount}</TableCell>
             </TableRow>
           ))}
         </TableBody>
         <TableFooter>
           <TableRow>
             <TableCell>Total Value</TableCell>
-            <TableCell>1</TableCell>
+            <TableCell>
+              {orders.reduce(
+                (sum, order) => sum + order.value * order.amount,
+                0
+              )}
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>
