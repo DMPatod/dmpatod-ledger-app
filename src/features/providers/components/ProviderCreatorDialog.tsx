@@ -13,11 +13,12 @@ import {
 import { green } from "@mui/material/colors";
 import axios from "axios";
 import React, { useState } from "react";
+import ProviderDTO from "../providerDTO";
 
-interface ProviderCreatorDialogProps
-  extends AsynchronousAutocompleteCreatableDialogProps {}
+// interface ProviderCreatorDialogProps
+//   extends AsynchronousAutocompleteCreatableDialogProps {}
 
-const ProviderCreatorDialog: React.FC<ProviderCreatorDialogProps> = ({
+const ProviderCreatorDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps> = ({
   parentState,
   setParentState,
   dispatchDialogValue,
@@ -60,6 +61,7 @@ const ProviderCreatorDialog: React.FC<ProviderCreatorDialogProps> = ({
               setParentState({ ...parentState, typed: ev.target.value });
             }}
           />
+          {error && <p>{error}</p>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

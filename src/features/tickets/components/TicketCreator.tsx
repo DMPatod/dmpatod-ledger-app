@@ -20,6 +20,7 @@ import TicketDTO, { Currency, Direction } from "../ticketDTO";
 import OrderDTO from "@/features/orders/orderDTO";
 import axios from "axios";
 import { green } from "@mui/material/colors";
+import ProviderDTO from "@/features/providers/providerDTO";
 
 const TicketCreator = () => {
   const [value, setValue] = useState<TicketDTO>({
@@ -31,7 +32,7 @@ const TicketCreator = () => {
     direction: Direction.Income,
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<String | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const pushOrder = (order: OrderDTO) => {
     setValue({ ...value, orders: [...value.orders, order] });
@@ -128,7 +129,7 @@ const TicketCreator = () => {
             variant="contained"
             onClick={async () => {
               setLoading(true);
-              var request = await axios.post("/api/tickets", value);
+              const request = await axios.post("/api/tickets", value);
               if (request.status < 200 || request.status >= 400) {
                 setLoading(false);
                 setError("Error");
@@ -162,6 +163,7 @@ const TicketCreator = () => {
           )}
         </Box>
       </Grid2>
+      {error && <p>{error}</p>}
     </Grid2>
   );
 };

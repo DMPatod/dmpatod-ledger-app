@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Autocomplete, createFilterOptions, TextField } from "@mui/material";
 import axios from "axios";
 import React, { Fragment, SetStateAction, useEffect, useState } from "react";
@@ -55,7 +56,7 @@ const AsynchronousAutocompleteCreatable: React.FC<
     };
 
     fetchOptions();
-  }, [innerValue]);
+  }, [innerValue, mapper, requestUrl]);
 
   const dispatchDialogValue = (value: any) => {
     setInnerValue(mapper(value));

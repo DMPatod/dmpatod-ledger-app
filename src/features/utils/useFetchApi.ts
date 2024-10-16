@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 function useFetchApi<T>(
   url: string,
   initialState: T,
-  fetchOptions?: RequestInit
 ): [T, boolean, string | null] {
   const [data, setData] = useState<T>(initialState);
   const [loading, setLoading] = useState<boolean>(true);
@@ -28,7 +27,7 @@ function useFetchApi<T>(
     };
 
     fetchData();
-  }, []);
+  }, [url]);
 
   return [data, loading, error];
 }

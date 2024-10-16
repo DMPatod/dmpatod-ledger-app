@@ -22,10 +22,10 @@ import styles from "@/pages/styles.module.scss";
 import axios from "axios";
 import { green } from "@mui/material/colors";
 
-interface ProductCreatorDialogProps
-  extends AsynchronousAutocompleteCreatableDialogProps {}
+// interface ProductCreatorDialogProps
+//   extends AsynchronousAutocompleteCreatableDialogProps {}
 
-const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
+const ProductCreatorDialog: React.FC<AsynchronousAutocompleteCreatableDialogProps> = ({
   parentState,
   setParentState,
   dispatchDialogValue,
@@ -108,6 +108,7 @@ const ProductCreatorDialog: React.FC<ProductCreatorDialogProps> = ({
               </Grid2>
             </Grid2>
           </Paper>
+          {error && <p>{error}</p>}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

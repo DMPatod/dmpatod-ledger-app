@@ -1,5 +1,6 @@
 import { Moment } from "moment";
 import OrderDTO from "../orders/orderDTO";
+import ProviderDTO from "../providers/providerDTO";
 
 export default interface TicketDTO {
   id?: string;
@@ -12,8 +13,8 @@ export default interface TicketDTO {
 }
 
 export enum Currency {
-  BRL,
   USD,
+  BRL,
   NZD,
 }
 

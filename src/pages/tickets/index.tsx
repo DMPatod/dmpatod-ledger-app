@@ -1,6 +1,6 @@
 import TicketsTable from "@/features/tickets/components/TicketsTable";
 
-const IndexTicket = () => {
+const IndexTickets = () => {
   return (
     <div>
       <main>
@@ -10,4 +10,4 @@ const IndexTicket = () => {
   );
 };
 
-export default IndexTicket;
+export default IndexTickets;

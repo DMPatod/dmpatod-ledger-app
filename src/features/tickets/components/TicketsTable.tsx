@@ -1,6 +1,7 @@
 import useFetchApi from "@/features/utils/useFetchApi";
 import {
   Button,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -38,6 +39,8 @@ const TicketsTable = () => {
         </Table>
       </TableContainer>
       <Button onClick={() => console.log(data)}>Log</Button>
+      {loading && <CircularProgress size={24} />}
+      {error && <p>{error}</p>}
     </Fragment>
   );
 };

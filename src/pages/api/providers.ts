@@ -1,3 +1,4 @@
+import ProviderDTO from "@/features/providers/providerDTO";
 import axios from "axios";
 import { NextApiRequest, NextApiResponse } from "next";
 

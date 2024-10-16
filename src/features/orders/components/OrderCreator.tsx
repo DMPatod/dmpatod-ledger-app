@@ -51,7 +51,7 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
             type="number"
             value={order.amount}
             onChange={(e) =>
-              setOrder({ ...order, amount: parseInt(e.target.value) })
+              setOrder({ ...order, amount: parseFloat(e.target.value) })
             }
           />
         </FormControl>
