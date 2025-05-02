@@ -31,6 +31,12 @@ const ProductsTable = () => {
                 </TableRow>
               );
             })}
+            <TableRow key={1}>
+              <TableCell>{1}</TableCell>
+              <TableCell>{2}</TableCell>
+              <TableCell>{3}</TableCell>
+              <TableCell>{4}</TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>

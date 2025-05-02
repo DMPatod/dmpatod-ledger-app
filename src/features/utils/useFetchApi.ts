@@ -14,13 +14,15 @@ function useFetchApi<T>(
       try {
         const request = await axios.get<T>(url);
         if (request.status < 200 || request.status >= 400) {
-          setError("Error fetching data");
-          return;
+          throw Error("Failed to fetch data.");
         }
         setData(request.data);
-      } catch (error) {
-        setError("Error fetching data");
-        console.log(error);
+      } catch (e) {
+        if(e instanceof Error){
+          setError(e.message);
+        } else {
+          setError("Uncaught exception occurred")
+        }
       } finally {
         setLoading(false);
       }

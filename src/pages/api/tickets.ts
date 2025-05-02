@@ -6,7 +6,7 @@ import ProductDTO from "@/features/products/productDTO";
 
 const serverUrl = process.env.SERVER_URL;
 
-async function retrieveTickets(req: NextApiRequest, res: NextApiResponse) {
+async function fetch(req: NextApiRequest, res: NextApiResponse) {
   const request = await axios.get<Array<TicketDTO>>(`${serverUrl}/tickets`);
   if (request.status < 200 && request.status >= 400) {
     console.error("Request Error");
@@ -15,7 +15,7 @@ async function retrieveTickets(req: NextApiRequest, res: NextApiResponse) {
   res.status(200).json(request.data);
 }
 
-async function createTicket(req: NextApiRequest, res: NextApiResponse) {
+async function create(req: NextApiRequest, res: NextApiResponse) {
   const request = await axios.post<TicketDTO>(`${serverUrl}/tickets`, {
     provider: req.body.provider.id,
     date: req.body.date,
@@ -41,10 +41,10 @@ export default async function handler(
 ) {
   switch (req.method) {
     case "GET":
-      await retrieveTickets(req, res);
+      await fetch(req, res);
       return;
     case "POST":
-      await createTicket(req, res);
+      await create(req, res);
       return;
   }
 

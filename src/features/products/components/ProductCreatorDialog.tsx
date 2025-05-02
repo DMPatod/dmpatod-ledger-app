@@ -9,7 +9,7 @@ import {
   DialogContentText,
   DialogTitle,
   FormControl,
-  Grid2,
+  Grid,
   InputLabel,
   MenuItem,
   Paper,
@@ -65,8 +65,8 @@ const ProductCreatorDialog: React.FC<AsynchronousAutocompleteCreatableDialogProp
             To add a new product, please fill the following form.
           </DialogContentText>
           <Paper className={styles.formPadding}>
-            <Grid2 container spacing={2}>
-              <Grid2 size={6}>
+            <Grid container spacing={2}>
+              <Grid size={6}>
                 <TextField
                   label="Name"
                   variant="standard"
@@ -75,8 +75,8 @@ const ProductCreatorDialog: React.FC<AsynchronousAutocompleteCreatableDialogProp
                     setParentState({ ...parentState, typed: ev.target.value });
                   }}
                 />
-              </Grid2>
-              <Grid2 size={6}>
+              </Grid>
+              <Grid size={6}>
                 <FormControl fullWidth>
                   <InputLabel>Mesure Unit</InputLabel>
                   <Select
@@ -105,8 +105,8 @@ const ProductCreatorDialog: React.FC<AsynchronousAutocompleteCreatableDialogProp
                     })}
                   </Select>
                 </FormControl>
-              </Grid2>
-            </Grid2>
+              </Grid>
+            </Grid>
           </Paper>
           {error && <p>{error}</p>}
         </DialogContent>

@@ -1,11 +1,10 @@
-import { Moment } from "moment";
 import OrderDTO from "../orders/orderDTO";
 import ProviderDTO from "../providers/providerDTO";
 
 export default interface TicketDTO {
   id?: string;
   provider: ProviderDTO | string | null;
-  date: Moment | null;
+  date: Date | null;
   orders: Array<OrderDTO>;
   installments: number;
   currency: Currency | number;

@@ -7,7 +7,7 @@ import {
   Button,
   CircularProgress,
   FormControl,
-  Grid2,
+  Grid,
   InputLabel,
   MenuItem,
   Paper,
@@ -39,17 +39,18 @@ const TicketCreator = () => {
   };
 
   return (
-    <Grid2 container spacing={2}>
-      <Grid2 size={2}>
+    <Grid container spacing={2}>
+      <Grid size={2}>
         <AsynchronousAutocompleteCreatable
+          //TODO: add value to clear the input after submit
           label="Provider"
           requestUrl="/api/providers"
           mapper={(data: ProviderDTO) => ({ label: data.name })}
           createrDialog={(props) => <ProviderCreatorDialog {...props} />}
           onChange={(provider) => setValue({ ...value, provider: provider })}
         />
-      </Grid2>
-      <Grid2 size={2}>
+      </Grid>
+      <Grid size={2}>
         <FormControl fullWidth>
           <DatePicker
             label="Date"
@@ -57,16 +58,16 @@ const TicketCreator = () => {
             onChange={(val) => setValue({ ...value, date: val })}
           />
         </FormControl>
-      </Grid2>
-      <Grid2 size={6}>
+      </Grid>
+      <Grid size={6}>
         <Paper className="formPadding">
-          <Grid2 container spacing={2}>
+          <Grid container spacing={2}>
             <OrderDisplay orders={value.orders} />
             <OrderCreator onSubmit={pushOrder} />
-          </Grid2>
+          </Grid>
         </Paper>
-      </Grid2>
-      <Grid2 size={2}>
+      </Grid>
+      <Grid size={2}>
         <TextField
           type="number"
           label="installments"
@@ -75,8 +76,8 @@ const TicketCreator = () => {
             setValue({ ...value, installments: parseInt(ev.target.value) })
           }
         />
-      </Grid2>
-      <Grid2 size={2}>
+      </Grid>
+      <Grid size={2}>
         <FormControl fullWidth>
           <InputLabel>Currency</InputLabel>
           <Select
@@ -98,8 +99,8 @@ const TicketCreator = () => {
             })}
           </Select>
         </FormControl>
-      </Grid2>
-      <Grid2 size={2}>
+      </Grid>
+      <Grid size={2}>
         <FormControl fullWidth>
           <InputLabel>Direction</InputLabel>
           <Select
@@ -121,8 +122,8 @@ const TicketCreator = () => {
             })}
           </Select>
         </FormControl>
-      </Grid2>
-      <Grid2 size={4}>
+      </Grid>
+      <Grid size={4}>
         <Box>
           <Button
             type="submit"
@@ -162,9 +163,9 @@ const TicketCreator = () => {
             />
           )}
         </Box>
-      </Grid2>
+      </Grid>
       {error && <p>{error}</p>}
-    </Grid2>
+    </Grid>
   );
 };
 

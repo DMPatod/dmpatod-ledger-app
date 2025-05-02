@@ -1,7 +1,7 @@
 import AsynchronousAutocompleteCreatable from "@/components/AsynchronousAutocompleteCreatable";
 import ProductCreatorDialog from "@/features/products/components/ProductCreatorDialog";
 import ProductDTO from "@/features/products/productDTO";
-import { Button, FormControl, Grid2, TextField } from "@mui/material";
+import { Button, FormControl, Grid, TextField } from "@mui/material";
 import { useState } from "react";
 import OrderDTO from "../orderDTO";
 
@@ -22,8 +22,8 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
   };
 
   return (
-    <Grid2 container spacing={2}>
-      <Grid2 size={4}>
+    <Grid container spacing={2}>
+      <Grid size={4}>
         <AsynchronousAutocompleteCreatable
           label="Product"
           requestUrl="/api/products"
@@ -31,8 +31,8 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
           createrDialog={(props) => <ProductCreatorDialog {...props} />}
           onChange={(product) => setOrder({ ...order, product: product })}
         />
-      </Grid2>
-      <Grid2 size={4}>
+      </Grid>
+      <Grid size={4}>
         <FormControl fullWidth>
           <TextField
             label="Value"
@@ -43,8 +43,8 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
             }
           />
         </FormControl>
-      </Grid2>
-      <Grid2 size={4}>
+      </Grid>
+      <Grid size={4}>
         <FormControl fullWidth>
           <TextField
             label="Amount"
@@ -55,8 +55,8 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
             }
           />
         </FormControl>
-      </Grid2>
-      <Grid2 size={4}>
+      </Grid>
+      <Grid size={4}>
         <FormControl fullWidth>
           <TextField
             label="Total"
@@ -64,11 +64,11 @@ const OrderCreator: React.FC<OrderCreatorProps> = ({ onSubmit }) => {
             value={order.value * order.amount}
           />
         </FormControl>
-      </Grid2>
+      </Grid>
       <Button variant="contained" onClick={handleSubmit}>
         Add
       </Button>
-    </Grid2>
+    </Grid>
   );
 };
 

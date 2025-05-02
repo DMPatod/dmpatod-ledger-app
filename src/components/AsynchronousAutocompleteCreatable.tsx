@@ -44,15 +44,23 @@ const AsynchronousAutocompleteCreatable: React.FC<
 
   useEffect(() => {
     const fetchOptions = async () => {
-      setLoading(true);
-      const request = await axios.get<Array<any>>(requestUrl);
-      if (request.status < 200 || request.status >= 400) {
-        setError("Failed to fetch data.");
-        return;
+      try{
+        setLoading(true);
+        const request = await axios.get<Array<any>>(requestUrl);
+        if (request.status < 200 || request.status >= 400) {
+          throw Error("Failed to fetch data.");
+        }
+        setMemory(request.data);
+        setOptions(request.data.map(mapper));
+      }catch (e){
+        if(e instanceof Error){
+          setError(e.message);
+        }else {
+          setError("Uncaught exception occurred")
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-      setMemory(request.data);
-      setOptions(request.data.map(mapper));
     };
 
     fetchOptions();
